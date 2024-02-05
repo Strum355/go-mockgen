@@ -3,8 +3,8 @@ package generation
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -27,6 +27,10 @@ type PackageOptions struct {
 	Interfaces  []string
 	Exclude     []string
 	Prefix      string
+
+	StdlibRoot string
+	Sources    []string
+	Archives   []string
 }
 
 type OutputOptions struct {
@@ -97,7 +101,6 @@ func generateDirectory(ifaces []*types.Interface, opts *Options) error {
 	if !opts.OutputOptions.Force {
 		allPaths := make([]string, 0, len(ifaces))
 		for _, iface := range ifaces {
-
 			allPaths = append(allPaths, makeFilename(iface))
 		}
 
@@ -131,7 +134,7 @@ func generateAndRender(ifaces []*types.Interface, filename string, opts *Options
 	}
 
 	log.Printf("writing to '%s'\n", paths.GetRelativePath(filename))
-	if err := ioutil.WriteFile(filename, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filename, []byte(content), 0o644); err != nil {
 		return err
 	}
 

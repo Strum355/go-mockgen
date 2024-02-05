@@ -67,7 +67,7 @@ func parseFlags() (*generation.Options, error) {
 	app := kingpin.New(consts.Name, consts.Description).Version(consts.Version)
 	app.UsageWriter(os.Stdout)
 
-	app.Arg("path", "The import paths used to search for eligible interfaces").Required().StringsVar(&opts.PackageOptions[0].ImportPaths)
+	app.Arg("path", "The import paths used to search for eligible interfaces").StringsVar(&opts.PackageOptions[0].ImportPaths)
 	app.Flag("package", "The name of the generated package. It will be inferred from the output options by default.").Short('p').StringVar(&opts.ContentOptions.PkgName)
 	app.Flag("interfaces", "A list of target interfaces to generate defined in the given the import paths.").Short('i').StringsVar(&opts.PackageOptions[0].Interfaces)
 	app.Flag("exclude", "A list of interfaces to exclude from generation. Mocks for all other exported interfaces defined in the given import paths are generated.").Short('e').StringsVar(&opts.PackageOptions[0].Exclude)
@@ -82,6 +82,10 @@ func parseFlags() (*generation.Options, error) {
 	app.Flag("for-test", "Append _test suffix to generated package names and file names.").Default("false").BoolVar(&opts.OutputOptions.ForTest)
 	app.Flag("file-prefix", "Content that is written at the top of each generated file.").StringVar(&opts.ContentOptions.FilePrefix)
 	app.Flag("build-constraints", "Build constraints that are added to each generated file.").StringVar(&opts.ContentOptions.BuildConstraints)
+
+	app.Flag("archives", "Values of the format IMPORTPATHS=IMPORTMAP=FILE=EXPORT, where IMPORTPATHS is a colon-delimited list of import paths, IMPORTMAP is the import path of the archive, FILE is the archive file path, and EXPORT is the export file path.").StringsVar(&opts.PackageOptions[0].Archives)
+	app.Flag("sources", "When using gcexportdata archives, specifies the filepaths to the sources to be parsed").StringsVar(&opts.PackageOptions[0].Sources)
+	// app.Flag("stdlibroot", "When using gcexportdata archives, specifies the path containing archive files for the Go stdlib").StringVar(&opts.PackageOptions[0].StdlibRoot)
 
 	if _, err := app.Parse(os.Args[1:]); err != nil {
 		return nil, err
